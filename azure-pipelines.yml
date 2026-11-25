@@ -1,0 +1,41 @@
+trigger:
+  - main
+
+resources:
+  - repo: self
+
+variables:
+  # 1. The name of the Docker Registry Service Connection created in Azure DevOps:
+  #    (Project Settings -> Service connections -> New service connection -> Docker Registry -> Azure Container Registry)
+  dockerRegistryServiceConnection: 'my-acr-service-connection'
+
+  # 2. The repository/image name inside ACR
+  imageRepository: 'game-foundation'
+
+  # 3. Path to the container build file
+  dockerfilePath: '$(Build.SourcesDirectory)/Containerfile'
+
+  # 4. Image tags
+  tag: '$(Build.BuildId)'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: BuildAndPush
+    displayName: 'Build and Push Stage'
+    jobs:
+      - job: BuildAndPushJob
+        displayName: 'Build and Push to ACR'
+        steps:
+          - task: Docker@2
+            displayName: 'Build and Push Image to Azure Container Registry'
+            inputs:
+              command: 'buildAndPush'
+              containerRegistry: '$(dockerRegistryServiceConnection)'
+              repository: '$(imageRepository)'
+              dockerfile: '$(dockerfilePath)'
+              buildContext: '$(Build.SourcesDirectory)'
+              tags: |
+                $(tag)
+                latest

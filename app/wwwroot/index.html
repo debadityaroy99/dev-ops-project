@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Foundation - DevOps Demonstration</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="app-header">
+      <div class="header-content">
+        <h1>Game Foundation</h1>
+        <p class="subtitle">DevOps Exercise: GitOps, Podman & Kubernetes</p>
+      </div>
+      <div class="env-pill" id="envBadge">
+        <span class="env-dot"></span>
+        <span class="env-text" id="envText">ENVIRONMENT: DETECTING...</span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Left Column: Game Foundation Board -->
+      <section class="card board-card">
+        <h2>3x3 Game Board</h2>
+        <p class="section-desc">Click below to fetch the reference board from <code>/api/boards/reference</code>.</p>
+        
+        <div class="board-grid" id="boardGrid">
+          <div class="cell" data-row="0" data-col="0">-</div>
+          <div class="cell" data-row="0" data-col="1">-</div>
+          <div class="cell" data-row="0" data-col="2">-</div>
+          <div class="cell" data-row="1" data-col="0">-</div>
+          <div class="cell" data-row="1" data-col="1">-</div>
+          <div class="cell" data-row="1" data-col="2">-</div>
+          <div class="cell" data-row="2" data-col="0">-</div>
+          <div class="cell" data-row="2" data-col="1">-</div>
+          <div class="cell" data-row="2" data-col="2">-</div>
+        </div>
+
+        <div class="actions">
+          <button id="loadBoardBtn" class="btn btn-primary">Load Reference Board</button>
+          <button id="checkHealthBtn" class="btn btn-secondary">Check /healthz</button>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+      </section>
+
+      <!-- Right Column: Diagnostics & Tracing -->
+      <section class="card diagnostics-card">
+        <h2>Request Tracing & Diagnostics</h2>
+        <p class="section-desc">Observe headers and request ID used for distributed logging in <code>kubectl logs</code>.</p>
+        
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="meta-label">Environment:</span>
+            <span class="meta-value" id="metaEnv">-</span>
+          </div>
+          <div class="metadata-item">
+            <span class="meta-label">Release:</span>
+            <span class="meta-value" id="metaRelease">-</span>
+          </div>
+          <div class="metadata-item full-width">
+            <span class="meta-label">Request ID (X-Request-ID):</span>
+            <span class="meta-value mono" id="metaRequestId">-</span>
+          </div>
+        </div>
+
+        <div class="response-panel">
+          <div class="panel-header">
+            <span>API Response Body (JSON)</span>
+            <span id="responseStatus" class="response-code"></span>
+          </div>
+          <pre id="jsonViewer">Click "Load Reference Board" to fetch data...</pre>
+        </div>
+
+        <div class="info-callout">
+          <strong>Tip for DevOps Learners:</strong>
+          <p>
+            When this API is called, the backend writes a JSON log to stdout containing the exact same <code>request_id</code>.
+            Run <code>kubectl logs &lt;pod-name&gt;</code> to correlate this web request with container logs!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Game Foundation DevOps Starter</span> &bull; 
+      <span>Endpoints: <code>/healthz</code> &bull; <code>/api/boards/reference</code></span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

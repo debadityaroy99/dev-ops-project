@@ -1,0 +1,99 @@
+# ==============================================================================
+# Kubernetes Resources for Game Foundation: ConfigMap, Deployment, and Service
+# ==============================================================================
+
+# 1. ConfigMap: Stores non-confidential environment configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foundation-config
+  labels:
+    app: foundation
+data:
+  # Initial environment is 'blue'. During Section 10, update this to 'green'.
+  LAB_ENV: "blue"
+  LAB_SESSION: "session-01"
+  RELEASE_NAME: "foundation-a"
+---
+# 2. Deployment: Manages the lifecycle of our Game Foundation Pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foundation
+  labels:
+    app: foundation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foundation
+  template:
+    metadata:
+      labels:
+        # NOTE: This label is what the Service selector targets
+        app: foundation
+    spec:
+      containers:
+        - name: foundation
+          # ====================================================================
+          # IMAGE PLACEHOLDER:
+          # In local Podman/Kind/Minikube testing, use: localhost/game-foundation:foundation-a
+          # In classroom/academy lab environments, update with your assigned registry:
+          # image: <CLASSROOM_REGISTRY>/<YOUR_NAMESPACE>/game-foundation:foundation-a
+          # ====================================================================
+          image: localhost/game-foundation:foundation-a
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: LAB_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: foundation-config
+                  key: LAB_ENV
+            - name: LAB_SESSION
+              valueFrom:
+                configMapKeyRef:
+                  name: foundation-config
+                  key: LAB_SESSION
+            - name: RELEASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: foundation-config
+                  key: RELEASE_NAME
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+---
+# 3. Service: Provides a stable network endpoint and load balancing to Pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: foundation
+  labels:
+    app: foundation
+spec:
+  type: ClusterIP
+  selector:
+    # NORMAL STATE: matches Pod label 'app: foundation'
+    # CONTROLLED FAILURE EXERCISE: change this selector to 'app: foundation-missing'
+    app: foundation
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
