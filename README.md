@@ -1,6 +1,6 @@
 # Game Foundation - DevOps Learning Project
 
-A beginner-friendly, end-to-end DevOps project built from scratch to demonstrate containerization, Kubernetes configuration, GitOps workflows with Argo CD, controlled failure diagnosis, configuration rollouts, and structured request tracing.
+A beginner-friendly, DevOps project built from scratch to demonstrate containerization
 
 ---
 
